@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calculadora de Factor de Potencia - Tuzzi Electricidad</title>
+    <style>
+        body {
+            font-family: "Courier New", Courier, monospace;
+            background-color: #f5f1e8;
+            margin: 0;
+            padding: 0;
+            color: #5a4a3f;
+        }
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        header {
+            background-color: #e0d5c1;
+            padding: 20px;
+            text-align: center;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        h1, h2, h3 {
+            color: #8b7355;
+        }
+        .calculator {
+            background-color: #ebe5d9;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+        }
+        .input-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        input, select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #d1c7b7;
+            border-radius: 5px;
+            background-color: #faf7f2;
+            font-family: "Courier New", Courier, monospace;
+        }
+        button {
+            background-color: #c4b299;
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            cursor: pointer;
+            border-radius: 5px;
+            font-family: "Courier New", Courier, monospace;
+            font-weight: bold;
+            transition: background-color 0.3s;
+        }
+        button:hover {
+            background-color: #a89878;
+        }
+        .results {
+            background-color: #f0e9dd;
+            padding: 20px;
+            border-radius: 10px;
+            margin-top: 20px;
+            display: none;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        .result-item {
+            margin-bottom: 10px;
+            padding: 10px;
+            background-color: #e8e0d0;
+            border-radius: 5px;
+        }
+        footer {
+            background-color: #e0d5c1;
+            padding: 20px;
+            text-align: center;
+            border-radius: 10px;
+            margin-top: 20px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        .contact-info {
+            margin-top: 10px;
+        }
+        .method-explanation {
+            background-color: #f0e9dd;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        .tabs {
+            display: flex;
+            margin-bottom: 15px;
+        }
+        .tab {
+            padding: 10px 20px;
+            background-color: #d9ceba;
+            margin-right: 5px;
+            border-radius: 5px 5px 0 0;
+            cursor: pointer;
+        }
+        .tab.active {
+            background-color: #c4b299;
+            color: white;
+        }
+        .tab-content {
+            display: none;
+        }
+        .tab-content.active {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Calculadora de Factor de Potencia cos(ϕ)</h1>
+            <h2>Tuzzi Electricidad</h2>
+            <div class="contact-info">
+                <p>Whatsapp: 3541389476</p>
+                <p>Email: davidtuzzi@gmail.com</p>
+            </div>
+        </header>
+
+        <div class="method-explanation">
+            <h3>¿Qué es el Factor de Potencia?</h3>
+            <p>El Factor de Potencia (FP) es la relación entre la potencia activa (P) y la potencia aparente (S) en un circuito eléctrico. Un factor de potencia bajo indica un uso ineficiente de la energía eléctrica y puede resultar en penalizaciones por parte de las compañías eléctricas.</p>
+            <p>FP = Potencia Activa (kW) / Potencia Aparente (kVA)</p>
+        </div>
+
+        <div class="calculator">
+            <div class="tabs">
+                <div class="tab active" onclick="switchTab('tab1')">Método 1: Potencias</div>
+                <div class="tab" onclick="switchTab('tab2')">Método 2: Mediciones</div>
+            </div>
+
+            <div id="tab1" class="tab-content active">
+                <h3>Cálculo por Potencias</h3>
+                <div class="input-group">
+                    <label for="potenciaActiva">Potencia Activa (kW):</label>
+                    <input type="number" id="potenciaActiva" step="0.01" placeholder="Ingrese la potencia activa en kW">
+                </div>
+                <div class="input-group">
+                    <label for="potenciaAparente">Potencia Aparente (kVA):</label>
+                    <input type="number" id="potenciaAparente" step="0.01" placeholder="Ingrese la potencia aparente en kVA">
+                </div>
+                <button onclick="calcularFPPotencias()">Calcular Factor de Potencia</button>
+            </div>
+
+            <div id="tab2" class="tab-content">
+                <h3>Cálculo por Mediciones</h3>
+                <div class="input-group">
+                    <label for="voltaje">Tensión (V):</label>
+                    <input type="number" id="voltaje" step="0.1" placeholder="Ingrese la tensión en voltios">
+                </div>
+                <div class="input-group">
+                    <label for="corriente">Corriente (A):</label>
+                    <input type="number" id="corriente" step="0.01" placeholder="Ingrese la corriente en amperios">
+                </div>
+                <div class="input-group">
+                    <label for="potenciaActiva2">Potencia Activa (W):</label>
+                    <input type="number" id="potenciaActiva2" step="1" placeholder="Ingrese la potencia activa en watts">
+                </div>
+                <button onclick="calcularFPMediciones()">Calcular Factor de Potencia</button>
+            </div>
+            
+            <div class="results" id="results">
+                <h3>Resultados del Cálculo</h3>
+                <div class="result-item">
+                    <strong>Factor de Potencia actual:</strong> <span id="fpActual">-</span>
+                </div>
+                <div class="result-item">
+                    <strong>Estado:</strong> <span id="fpEstado">-</span>
+                </div>
+                <div class="result-item">
+                    <strong>Ángulo φ:</strong> <span id="angulo">-</span>
+                </div>
+                <div class="result-item">
+                    <strong>Potencia Reactiva:</strong> <span id="potenciaReactiva">-</span> kVAr
+                </div>
+            </div>
+        </div>
+        
+        <div class="method-explanation">
+            <h3>¿Por qué es importante corregir el Factor de Potencia?</h3>
+            <p>Un factor de potencia bajo significa:</p>
+            <ul>
+                <li>Mayor consumo de corriente</li>
+                <li>Pérdidas en conductores</li>
+                <li>Caídas de tensión</li>
+                <li>Posibles penalizaciones en la factura eléctrica</li>
+            </ul>
+            <p>En Tuzzi Electricidad ofrecemos soluciones para la corrección del factor de potencia mediante la instalación de bancos de capacitores adecuados a sus necesidades.</p>
+        </div>
+
+        <footer>
+            <h3>Tuzzi Electricidad</h3>
+            <p>Especialistas en instalaciones eléctricas industriales y corrección del factor de potencia</p>
+            <div class="contact-info">
+                <p>Teléfono: 3541389476</p>
+                <p>Email: davidtuzzi@gmail.com</p>
+            </div>
+        </footer>
+    </div>
+
+    <script>
+        function switchTab(tabId) {
+            // Ocultar todos los contenidos de tabs
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.classList.remove('active');
+            });
+            
+            // Desactivar todos los tabs
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            // Activar el tab seleccionado
+            document.getElementById(tabId).classList.add('active');
+            document.querySelector(`.tab[onclick="switchTab('${tabId}')"]`).classList.add('active');
+        }
+
+        function calcularFPPotencias() {
+            const potenciaActiva = parseFloat(document.getElementById('potenciaActiva').value);
+            const potenciaAparente = parseFloat(document.getElementById('potenciaAparente').value);
+            
+            if (isNaN(potenciaActiva) || isNaN(potenciaAparente) || potenciaActiva <= 0 || potenciaAparente <= 0) {
+                alert("Por favor, ingrese valores válidos mayores que cero.");
+                return;
+            }
+
+            if (potenciaActiva > potenciaAparente) {
+                alert("La potencia activa no puede ser mayor que la potencia aparente.");
+                return;
+            }
+            
+            const factorPotencia = potenciaActiva / potenciaAparente;
+            const angulo = Math.acos(factorPotencia) * (180 / Math.PI);
+            const potenciaReactiva = Math.sqrt(Math.pow(potenciaAparente, 2) - Math.pow(potenciaActiva, 2));
+            
+            mostrarResultados(factorPotencia, angulo, potenciaReactiva);
+        }
+
+        function calcularFPMediciones() {
+            const voltaje = parseFloat(document.getElementById('voltaje').value);
+            const corriente = parseFloat(document.getElementById('corriente').value);
+            const potenciaActiva = parseFloat(document.getElementById('potenciaActiva2').value);
+            
+            if (isNaN(voltaje) || isNaN(corriente) || isNaN(potenciaActiva) || 
+                voltaje <= 0 || corriente <= 0 || potenciaActiva <= 0) {
+                alert("Por favor, ingrese valores válidos mayores que cero.");
+                return;
+            }
+            
+            // Para sistemas monofásicos
+            const potenciaAparente = voltaje * corriente / 1000; // en kVA
+            const potenciaActivaKW = potenciaActiva / 1000; // convertir W a kW
+            
+            if (potenciaActivaKW > potenciaAparente) {
+                alert("La potencia calculada no es válida. Verifique sus mediciones.");
+                return;
+            }
+            
+            const factorPotencia = potenciaActivaKW / potenciaAparente;
+            const angulo = Math.acos(factorPotencia) * (180 / Math.PI);
+            const potenciaReactiva = Math.sqrt(Math.pow(potenciaAparente, 2) - Math.pow(potenciaActivaKW, 2));
+            
+            mostrarResultados(factorPotencia, angulo, potenciaReactiva);
+        }
+
+        function mostrarResultados(fp, angulo, potenciaReactiva) {
+            document.getElementById('fpActual').textContent = fp.toFixed(3);
+            
+            let estado = "";
+            if (fp >= 0.95) {
+                estado = "Excelente";
+            } else if (fp >= 0.9) {
+                estado = "Bueno";
+            } else if (fp >= 0.85) {
+                estado = "Aceptable";
+            } else {
+                estado = "Bajo - Se recomienda corrección";
+            }
+            
+            document.getElementById('fpEstado').textContent = estado;
+            document.getElementById('angulo').textContent = angulo.toFixed(2) + "°";
+            document.getElementById('potenciaReactiva').textContent = potenciaReactiva.toFixed(3);
+            
+            document.getElementById('results').style.display = 'block';
+        }
+    </script>
+</body>
+</html>

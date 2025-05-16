@@ -1,0 +1,681 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Correccion de Factor de Potencia - Tuzzi Electricidad</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjs/11.5.0/math.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <style>
+        body {
+            font-family: "Courier New", monospace;
+            background-color: #f5f1e8;
+            color: #5a4e42;
+            margin: 0;
+            padding: 0;
+            line-height: 1.6;
+        }
+        
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        header {
+            background-color: #e8dcca;
+            padding: 20px;
+            border-radius: 5px;
+            text-align: center;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        
+        h1, h2, h3 {
+            color: #7d6e55;
+        }
+        
+        .logo {
+            font-size: 28px;
+            font-weight: bold;
+            color: #a9825d;
+            margin-bottom: 5px;
+            letter-spacing: 1px;
+        }
+        
+        .contact-info {
+            color: #8a7a66;
+            font-size: 14px;
+            margin-top: 10px;
+        }
+        
+        .form-section, .results-section {
+            background-color: #efe8db;
+            padding: 25px;
+            border-radius: 5px;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        
+        .form-group {
+            margin-bottom: 15px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+            color: #7d6e55;
+        }
+        
+        input, select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #d1c5ae;
+            border-radius: 4px;
+            background-color: #f9f6f0;
+            font-family: "Courier New", monospace;
+            font-size: 16px;
+            color: #5a4e42;
+            box-sizing: border-box;
+        }
+        
+        button {
+            background-color: #b69d7a;
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-family: "Courier New", monospace;
+            font-weight: bold;
+            font-size: 16px;
+            transition: background-color 0.3s;
+            margin-right: 10px;
+            margin-top: 10px;
+        }
+        
+        button:hover {
+            background-color: #a08a69;
+        }
+        
+        .charts-container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            margin-bottom: 20px;
+        }
+        
+        .chart-wrapper {
+            width: 48%;
+            background-color: #f9f6f0;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        @media (max-width: 768px) {
+            .chart-wrapper {
+                width: 100%;
+            }
+        }
+        
+        #results-container {
+            display: none;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            background-color: #f9f6f0;
+        }
+        
+        th, td {
+            padding: 12px 15px;
+            border: 1px solid #d1c5ae;
+            text-align: left;
+        }
+        
+        th {
+            background-color: #e8dcca;
+            color: #7d6e55;
+            font-weight: bold;
+        }
+        
+        tr:nth-child(even) {
+            background-color: #f1ebe0;
+        }
+        
+        .info-box {
+            background-color: #e8dcca;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            border-left: 5px solid #b69d7a;
+        }
+        
+        .print-area {
+            width: 100%;
+        }
+        
+        footer {
+            text-align: center;
+            padding: 20px;
+            background-color: #e8dcca;
+            color: #7d6e55;
+            border-radius: 5px;
+            margin-top: 30px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Corrector de Factor de Potencia</h1>
+            <h2>Tuzzi Electricidad</h2>
+            <div class="contact-info">
+                <p>Whatsapp: 3541389476</p>
+                <p>Email: davidtuzzi@gmail.com</p>
+            </div>
+        </header>
+        
+        <div class="form-section">
+            <h2>Datos de la Instalación</h2>
+            <div class="form-group">
+                <label for="potencia-activa">Potencia Activa (kW):</label>
+                <input type="number" id="potencia-activa" step="0.01" min="0" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="potencia-aparente">Potencia Aparente (kVA):</label>
+                <input type="number" id="potencia-aparente" step="0.01" min="0" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="fp-actual">Factor de Potencia Actual cos(ϕ):</label>                
+                <input type="number" id="fp-actual" step="0.01" min="0" max="1" required>
+                <button type="button" onclick="window.open('calculadora-fp.html', '_blank')">Calcular cos(ϕ)</button>
+            </div>
+            
+            <div class="form-group">
+                <label for="fp-deseado">Factor de Potencia Deseado:</label>
+                <input type="number" id="fp-deseado" step="0.01" min="0" max="1" value="0.95" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="voltaje">Voltaje de la Instalación (V):</label>
+                <input type="number" id="voltaje" step="1" min="0" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="frecuencia">Frecuencia (Hz):</label>
+                <input type="number" id="frecuencia" step="1" min="50" max="60" value="50" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="tipo-instalacion">Tipo de Instalación:</label>
+                <select id="tipo-instalacion">
+                    <option value="monofasica">Monofásica</option>
+                    <option value="trifasica" selected>Trifásica</option>
+                </select>
+            </div>
+            
+            <button id="calcular-btn">Calcular</button>
+            <button id="limpiar-btn">Limpiar</button>
+        </div>
+        
+        <div id="results-container" class="results-section">
+            <div class="print-area" id="print-area">
+                <h2>Resultados del Análisis</h2>
+                
+                <div class="info-box">
+                    <h3>Datos Iniciales</h3>
+                    <p><strong>Potencia Activa:</strong> <span id="resultado-potencia-activa"></span> kW</p>
+                    <p><strong>Potencia Aparente:</strong> <span id="resultado-potencia-aparente"></span> kVA</p>
+                    <p><strong>Potencia Reactiva:</strong> <span id="resultado-potencia-reactiva"></span> kVAr</p>
+                    <p><strong>Factor de Potencia Actual:</strong> <span id="resultado-fp-actual"></span></p>
+                    <p><strong>Ángulo φ Actual:</strong> <span id="resultado-angulo-actual"></span> grados</p>
+                </div>
+                
+                <div class="charts-container">
+                    <div class="chart-wrapper">
+                        <h3>Triángulo de Potencias (Actual)</h3>
+                        <canvas id="triangulo-actual"></canvas>
+                    </div>
+                    
+                    <div class="chart-wrapper">
+                        <h3>Fases Desfasadas (Actual)</h3>
+                        <canvas id="fases-actual"></canvas>
+                    </div>
+                </div>
+                
+                <div class="info-box">
+                    <h3>Corrección del Factor de Potencia</h3>
+                    <p><strong>Factor de Potencia Deseado:</strong> <span id="resultado-fp-deseado"></span></p>
+                    <p><strong>Ángulo φ Deseado:</strong> <span id="resultado-angulo-deseado"></span> grados</p>
+                    <p><strong>Potencia Reactiva Necesaria:</strong> <span id="resultado-potencia-reactiva-necesaria"></span> kVAr</p>
+                </div>
+                
+                <div class="info-box">
+                    <h3>Diseño del Banco de Capacitores</h3>
+                    <div id="capacitores-container">
+                        <table id="tabla-capacitores">
+                            <thead>
+                                <tr>
+                                    <th>Capacitor</th>
+                                    <th>Capacidad (kVAr)</th>
+                                    <th>Capacitancia (μF)</th>
+                                    <th>Corriente (A)</th>
+                                </tr>
+                            </thead>
+                            <tbody id="capacitores-body"></tbody>
+                        </table>
+                    </div>
+                </div>
+                
+                <div class="charts-container">
+                    <div class="chart-wrapper">
+                        <h3>Triángulo de Potencias (Corregido)</h3>
+                        <canvas id="triangulo-corregido"></canvas>
+                    </div>
+                    
+                    <div class="chart-wrapper">
+                        <h3>Fases Corregidas</h3>
+                        <canvas id="fases-corregido"></canvas>
+                    </div>
+                </div>
+                
+                <div class="info-box">
+                    <h3>Beneficios Económicos</h3>
+                    <p><strong>Reducción estimada en la factura eléctrica:</strong> <span id="resultado-ahorro"></span>%</p>
+                    <p><strong>Aumento de capacidad en la instalación:</strong> <span id="resultado-capacidad"></span>%</p>
+                </div>
+                
+                <footer>
+                    <div class="logo">TUZZI ELECTRICIDAD</div>
+                    <p>Especialistas en eficiencia energética y corrección del factor de potencia</p>
+                    <p class="contact-info">Teléfono: 3541389476 | Email: davidtuzzi@gmail.com</p>
+                </footer>
+            </div>
+            
+            <div class="buttons-container">
+                <button id="imprimir-btn">Imprimir PDF</button>
+                <button id="nuevo-calculo-btn">Nuevo Cálculo</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Referencias a los elementos del DOM
+            const calcularBtn = document.getElementById('calcular-btn');
+            const limpiarBtn = document.getElementById('limpiar-btn');
+            const imprimirBtn = document.getElementById('imprimir-btn');
+            const nuevoCalculoBtn = document.getElementById('nuevo-calculo-btn');
+            const resultsContainer = document.getElementById('results-container');
+            
+            // Charts
+            let chartTrianguloActual = null;
+            let chartFasesActual = null;
+            let chartTrianguloCorregido = null;
+            let chartFasesCorregido = null;
+            
+            // Función para calcular el factor de potencia
+            calcularBtn.addEventListener('click', function() {
+                // Obtener valores del formulario
+                const potenciaActiva = parseFloat(document.getElementById('potencia-activa').value);
+                const potenciaAparente = parseFloat(document.getElementById('potencia-aparente').value);
+                const fpActual = parseFloat(document.getElementById('fp-actual').value);
+                const fpDeseado = parseFloat(document.getElementById('fp-deseado').value);
+                const voltaje = parseFloat(document.getElementById('voltaje').value);
+                const frecuencia = parseFloat(document.getElementById('frecuencia').value);
+                const tipoInstalacion = document.getElementById('tipo-instalacion').value;
+                
+                // Validar entradas
+                if (!potenciaActiva || !potenciaAparente || !fpActual || !fpDeseado || !voltaje || !frecuencia) {
+                    alert('Por favor, complete todos los campos obligatorios.');
+                    return;
+                }
+                
+                if (fpActual >= fpDeseado) {
+                    alert('El factor de potencia deseado debe ser mayor que el factor de potencia actual.');
+                    return;
+                }
+                
+                // Cálculos
+                const anguloActual = Math.acos(fpActual) * (180 / Math.PI);
+                const anguloDeseado = Math.acos(fpDeseado) * (180 / Math.PI);
+                
+                // Potencia reactiva actual
+                const potenciaReactiva = potenciaActiva * Math.tan(anguloActual * (Math.PI / 180));
+                
+                // Potencia reactiva deseada
+                const potenciaReactivaDeseada = potenciaActiva * Math.tan(anguloDeseado * (Math.PI / 180));
+                
+                // Potencia reactiva a compensar
+                const potenciaReactivaNecesaria = potenciaReactiva - potenciaReactivaDeseada;
+                
+                // Mostrar resultados
+                document.getElementById('resultado-potencia-activa').textContent = potenciaActiva.toFixed(2);
+                document.getElementById('resultado-potencia-aparente').textContent = potenciaAparente.toFixed(2);
+                document.getElementById('resultado-potencia-reactiva').textContent = potenciaReactiva.toFixed(2);
+                document.getElementById('resultado-fp-actual').textContent = fpActual.toFixed(2);
+                document.getElementById('resultado-angulo-actual').textContent = anguloActual.toFixed(2);
+                document.getElementById('resultado-fp-deseado').textContent = fpDeseado.toFixed(2);
+                document.getElementById('resultado-angulo-deseado').textContent = anguloDeseado.toFixed(2);
+                document.getElementById('resultado-potencia-reactiva-necesaria').textContent = potenciaReactivaNecesaria.toFixed(2);
+                
+                // Calcular ahorro y capacidad
+                const ahorro = ((1 - fpActual/fpDeseado) * 100).toFixed(2);
+                const capacidad = ((fpDeseado/fpActual - 1) * 100).toFixed(2);
+                document.getElementById('resultado-ahorro').textContent = ahorro;
+                document.getElementById('resultado-capacidad').textContent = capacidad;
+                
+                // Diseño del banco de capacitores
+                const factorMultiplicador = (tipoInstalacion === 'trifasica') ? Math.sqrt(3) : 1;
+                let capacitoresHTML = '';
+                
+                // Para instalación trifásica se dividirá en 3 capacitores iguales
+                let numCapacitores = (tipoInstalacion === 'trifasica') ? 3 : 1;
+                let potenciaPorCapacitor = potenciaReactivaNecesaria / numCapacitores;
+                
+                for (let i = 0; i < numCapacitores; i++) {
+                    // Cálculo de la capacitancia en microfaradios
+                    // C = P / (2πfV²) * 10^6 (para microfaradios)
+                    const capacitancia = (potenciaPorCapacitor * 1000) / (2 * Math.PI * frecuencia * Math.pow(voltaje/factorMultiplicador, 2)) * 1000000;
+                    
+                    // Cálculo de la corriente en amperios
+                    // I = P / (V * 1.732) para trifásico o I = P / V para monofásico
+                    const corriente = (potenciaPorCapacitor * 1000) / (voltaje * (tipoInstalacion === 'trifasica' ? Math.sqrt(3) : 1));
+                    
+                    capacitoresHTML += `
+                        <tr>
+                            <td>Capacitor ${i + 1}</td>
+                            <td>${potenciaPorCapacitor.toFixed(2)} kVAr</td>
+                            <td>${capacitancia.toFixed(2)} μF</td>
+                            <td>${corriente.toFixed(2)} A</td>
+                        </tr>
+                    `;
+                }
+                
+                document.getElementById('capacitores-body').innerHTML = capacitoresHTML;
+                
+                // Mostrar resultados
+                resultsContainer.style.display = 'block';
+                
+                // Crear gráficos
+                crearGraficos(potenciaActiva, potenciaReactiva, potenciaReactivaDeseada, anguloActual, anguloDeseado);
+                
+                // Desplazar hacia los resultados
+                resultsContainer.scrollIntoView({ behavior: 'smooth' });
+            });
+            
+            // Función para crear gráficos
+            function crearGraficos(potenciaActiva, potenciaReactiva, potenciaReactivaDeseada, anguloActual, anguloDeseado) {
+                const potenciaAparente = Math.sqrt(Math.pow(potenciaActiva, 2) + Math.pow(potenciaReactiva, 2));
+                const potenciaAparenteCorregida = Math.sqrt(Math.pow(potenciaActiva, 2) + Math.pow(potenciaReactivaDeseada, 2));
+                
+                // Destruir gráficos anteriores si existen
+                if (chartTrianguloActual) chartTrianguloActual.destroy();
+                if (chartFasesActual) chartFasesActual.destroy();
+                if (chartTrianguloCorregido) chartTrianguloCorregido.destroy();
+                if (chartFasesCorregido) chartFasesCorregido.destroy();
+                
+                // Crear gráfico del triángulo de potencias actual
+                const ctxTrianguloActual = document.getElementById('triangulo-actual').getContext('2d');
+                chartTrianguloActual = new Chart(ctxTrianguloActual, {
+                    type: 'scatter',
+                    data: {
+                        datasets: [
+                            {
+                                type: 'line',
+                                label: 'Triángulo de Potencias',
+                                data: [
+                                    { x: 0, y: 0 },
+                                    { x: potenciaActiva, y: 0 },
+                                    { x: potenciaActiva, y: potenciaReactiva },
+                                    { x: 0, y: 0 }
+                                ],
+                                backgroundColor: 'rgba(182, 157, 122, 0.2)',
+                                borderColor: 'rgba(182, 157, 122, 1)',
+                                borderWidth: 2,
+                                fill: true
+                            }
+                        ]
+                    },
+                    options: {
+                        scales: {
+                            x: {
+                                title: {
+                                    display: true,
+                                    text: 'Potencia Activa (kW)'
+                                }
+                            },
+                            y: {
+                                title: {
+                                    display: true,
+                                    text: 'Potencia Reactiva (kVAr)'
+                                }
+                            }
+                        },
+                        plugins: {
+                            legend: {
+                                display: false
+                            },
+                            annotation: {
+                                annotations: {
+                                    label1: {
+                                        type: 'label',
+                                        xValue: potenciaActiva / 2,
+                                        yValue: 0,
+                                        content: ['P = ' + potenciaActiva.toFixed(2) + ' kW'],
+                                        position: 'bottom'
+                                    },
+                                    label2: {
+                                        type: 'label',
+                                        xValue: potenciaActiva,
+                                        yValue: potenciaReactiva / 2,
+                                        content: ['Q = ' + potenciaReactiva.toFixed(2) + ' kVAr'],
+                                        position: 'right'
+                                    },
+                                    label3: {
+                                        type: 'label',
+                                        xValue: potenciaActiva / 2,
+                                        yValue: potenciaReactiva / 2,
+                                        content: ['S = ' + potenciaAparente.toFixed(2) + ' kVA'],
+                                        position: 'center'
+                                    }
+                                }
+                            }
+                        }
+                    }
+                });
+                
+                // Crear gráfico de fases actual
+                const ctxFasesActual = document.getElementById('fases-actual').getContext('2d');
+                chartFasesActual = new Chart(ctxFasesActual, {
+                    type: 'line',
+                    data: {
+                        labels: Array.from({length: 360}, (_, i) => i),
+                        datasets: [
+                            {
+                                label: 'Tensión',
+                                data: Array.from({length: 360}, (_, i) => Math.sin(i * Math.PI / 180)),
+                                borderColor: 'rgba(125, 110, 85, 1)',
+                                borderWidth: 2,
+                                fill: false,
+                                tension: 0
+                            },
+                            {
+                                label: 'Corriente',
+                                data: Array.from({length: 360}, (_, i) => Math.sin((i - anguloActual) * Math.PI / 180)),
+                                borderColor: 'rgba(169, 130, 93, 1)',
+                                borderWidth: 2,
+                                fill: false,
+                                tension: 0
+                            }
+                        ]
+                    },
+                    options: {
+                        scales: {
+                            x: {
+                                display: false
+                            },
+                            y: {
+                                display: true
+                            }
+                        },
+                        aspectRatio: 3,
+                        plugins: {
+                            title: {
+                                display: true,
+                                text: `Desfase: ${anguloActual.toFixed(2)}°`
+                            }
+                        }
+                    }
+                });
+                
+                // Crear gráfico del triángulo de potencias corregido
+                const ctxTrianguloCorregido = document.getElementById('triangulo-corregido').getContext('2d');
+                chartTrianguloCorregido = new Chart(ctxTrianguloCorregido, {
+                    type: 'scatter',
+                    data: {
+                        datasets: [
+                            {
+                                type: 'line',
+                                label: 'Triángulo de Potencias Corregido',
+                                data: [
+                                    { x: 0, y: 0 },
+                                    { x: potenciaActiva, y: 0 },
+                                    { x: potenciaActiva, y: potenciaReactivaDeseada },
+                                    { x: 0, y: 0 }
+                                ],
+                                backgroundColor: 'rgba(138, 122, 102, 0.2)',
+                                borderColor: 'rgba(138, 122, 102, 1)',
+                                borderWidth: 2,
+                                fill: true
+                            }
+                        ]
+                    },
+                    options: {
+                        scales: {
+                            x: {
+                                title: {
+                                    display: true,
+                                    text: 'Potencia Activa (kW)'
+                                }
+                            },
+                            y: {
+                                title: {
+                                    display: true,
+                                    text: 'Potencia Reactiva (kVAr)'
+                                }
+                            }
+                        },
+                        plugins: {
+                            legend: {
+                                display: false
+                            }
+                        }
+                    }
+                });
+                
+                // Crear gráfico de fases corregido
+                const ctxFasesCorregido = document.getElementById('fases-corregido').getContext('2d');
+                chartFasesCorregido = new Chart(ctxFasesCorregido, {
+                    type: 'line',
+                    data: {
+                        labels: Array.from({length: 360}, (_, i) => i),
+                        datasets: [
+                            {
+                                label: 'Tensión',
+                                data: Array.from({length: 360}, (_, i) => Math.sin(i * Math.PI / 180)),
+                                borderColor: 'rgba(125, 110, 85, 1)',
+                                borderWidth: 2,
+                                fill: false,
+                                tension: 0
+                            },
+                            {
+                                label: 'Corriente Corregida',
+                                data: Array.from({length: 360}, (_, i) => Math.sin((i - anguloDeseado) * Math.PI / 180)),
+                                borderColor: 'rgba(169, 130, 93, 1)',
+                                borderWidth: 2,
+                                fill: false,
+                                tension: 0
+                            }
+                        ]
+                    },
+                    options: {
+                        scales: {
+                            x: {
+                                display: false
+                            },
+                            y: {
+                                display: true
+                            }
+                        },
+                        aspectRatio: 3,
+                        plugins: {
+                            title: {
+                                display: true,
+                                text: `Desfase Corregido: ${anguloDeseado.toFixed(2)}°`
+                            }
+                        }
+                    }
+                });
+            }
+            
+            // Función para limpiar el formulario
+            limpiarBtn.addEventListener('click', function() {
+                document.getElementById('potencia-activa').value = '';
+                document.getElementById('potencia-aparente').value = '';
+                document.getElementById('fp-actual').value = '';
+                document.getElementById('fp-deseado').value = '0.95';
+                document.getElementById('voltaje').value = '';
+                document.getElementById('frecuencia').value = '50';
+                document.getElementById('tipo-instalacion').value = 'trifasica';
+            });
+            
+            // Función para imprimir PDF
+            imprimirBtn.addEventListener('click', function() {
+                const { jsPDF } = window.jspdf;
+                const printArea = document.getElementById('print-area');
+                
+                // Crear PDF
+                html2canvas(printArea).then(canvas => {
+                    const imgData = canvas.toDataURL('image/png');
+                    const imgWidth = 210; // A4 width in mm
+                    const pageHeight = 297; // A4 height in mm
+                    const imgHeight = canvas.height * imgWidth / canvas.width;
+                    const pdf = new jsPDF('p', 'mm');
+                    
+                    let heightLeft = imgHeight;
+                    let position = 0;
+                    
+                    pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
+                    heightLeft -= pageHeight;
+                    
+                    while (heightLeft >= 0) {
+                        position = heightLeft - imgHeight;
+                        pdf.addPage();
+                        pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
+                        heightLeft -= pageHeight;
+                    }
+                    
+                    pdf.save('Calculo_Factor_Potencia_Tuzzi.pdf');
+                });
+            });
+            
+            // Función para iniciar un nuevo cálculo
+            nuevoCalculoBtn.addEventListener('click', function() {
+                resultsContainer.style.display = 'none';
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            });
+        });
+    </script>
+</body>
+</html>
