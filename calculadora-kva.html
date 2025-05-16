@@ -1,0 +1,631 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calculadora de KVA - Tuzzi Electricidad</title>
+    <style>
+        
+        
+        body {
+            font-family: "Courier New", monospace;
+            background-color: #f5f1e8;
+            color: #5a4e42;
+            margin: 0;
+            padding: 0;
+            line-height: 1.6;
+        }
+        
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+    header {
+            background-color: #e8dcca;
+            padding: 20px;
+            border-radius: 5px;
+            text-align: center;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        
+        h1, h2, h3 {
+            color: #7d6e55;
+        }
+        
+        .logo {
+            font-size: 28px;
+            font-weight: bold;
+            color: #a9825d;
+            margin-bottom: 5px;
+            letter-spacing: 1px;
+        }
+        
+        .contact-info {
+            color: #8a7a66;
+            font-size: 14px;
+            margin-top: 10px;
+        }
+        
+        .contact-info p {
+            font-weight: bold;
+        }
+        
+        .calculator-container {
+            background-color: #ebe5d9;
+            padding: 30px;
+            border-radius: 0 0 8px 8px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        
+        .tabs {
+            display: flex;
+            margin-bottom: 20px;
+            border-bottom: 3px solid #c4b299;
+            overflow-x: auto;
+
+             
+    gap: 5px;
+        }
+        
+        .tab-button {
+            padding: 12px 24px;
+            background-color: #cfc1ad;
+            border: none;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+        
+        .tab-button:hover {
+            background-color: #e0d5c1;
+        }
+        
+        .tab-button.active {
+            background-color: #aa9a84;
+        }
+        
+        .tab-content {
+            display: none;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 0.5s ease;
+        }
+        
+        .tab-content.active {
+            display: block;
+            opacity: 1;
+            transform: translateY(0);
+        }
+        
+        .input-group {
+            margin-bottom: 20px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+        }
+        
+        input, select {
+            width: 100%;
+            padding: 12px;
+            font-size: 1rem;
+            border: 2px solid #c4b299;
+            border-radius: 4px;
+            background-color: #f5f1e8;
+            font-family: 'Courier New', monospace;
+        }
+        
+        input:focus, select:focus {
+            outline: none;
+            border-color: #a89878;
+            box-shadow: 0 0 5px rgba(168, 152, 120, 0.5);
+        }
+        
+        .error-message {
+            color: #d9534f;
+            margin-top: 5px;
+            font-size: 0.9rem;
+            display: none;
+        }
+        
+        button {
+            background-color: #c4b299;
+            color: white;
+            border: none;
+            padding: 14px 28px;
+            font-size: 1rem;
+            font-weight: bold;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            margin-top: 20px;
+        }
+        
+        button:hover {
+            background-color: #a89878;
+        }
+        
+        .result-container {
+            margin-top: 30px;
+            background-color: #f5f1e8;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            display: none;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 0.5s ease;
+        }
+        
+        .result-container.active {
+            display: block;
+            opacity: 1;
+            transform: translateY(0);
+        }
+        
+        .result-value {
+            font-size: 2rem;
+            font-weight: bold;
+            text-align: center;
+            margin: 20px 0;
+            color: #a89878;
+        }
+        
+        .formula-explanation {
+            margin-top: 30px;
+            font-size: 0.9rem;
+            background-color: #f5f1e8;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        
+        .formula-explanation h3 {
+            margin-bottom: 10px;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+        
+        table, th, td {
+            border: 1px solid #c4b299;
+        }
+        
+        th, td {
+            padding: 12px;
+            text-align: left;
+        }
+        
+        th {
+            background-color: #e0d5c1;
+        }
+        
+        @media (max-width: 768px) {
+            .container {
+                padding: 15px;
+            }
+            
+            header, .calculator-container {
+                padding: 20px;
+            }
+            
+            .tab-button {
+                padding: 10px 15px;
+                font-size: 0.9rem;
+            }
+            
+            .result-value {
+                font-size: 1.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Calculadora kVa</h1>
+            <h2>Tuzzi Electricidad</h2>
+            <div class="contact-info">
+                <p>Whatsapp: 3541389476</p>
+                <p>Email: davidtuzzi@gmail.com</p>
+            </div>
+        </header>
+        
+        <div class="calculator-container">
+            <div class="tabs">
+                <button class="tab-button active" data-tab="monofasico">Monofásico</button>
+                <button class="tab-button" data-tab="trifasico">Trifásico</button>
+                
+                <button class="tab-button" data-tab="tablas">Tablas de Referencia</button>
+            </div>
+            
+            <div id="monofasico" class="tab-content active">
+                <h2>Cálculo de KVA Monofásico</h2>
+                <div class="input-group">
+                    <label for="mono-tension">Tensión (V):</label>
+                    <input type="number" id="mono-tension" placeholder="Ingrese tensión en Voltios" min="0">
+                    <div class="error-message" id="mono-tension-error">Por favor ingrese un valor válido para la tensión</div>
+                </div>
+                
+                <div class="input-group">
+                    <label for="mono-corriente">Corriente (A):</label>
+                    <input type="number" id="mono-corriente" placeholder="Ingrese corriente en Amperios" min="0">
+                    <div class="error-message" id="mono-corriente-error">Por favor ingrese un valor válido para la corriente</div>
+                </div>
+                
+                <div class="input-group">
+                    <label for="mono-fp">Factor de Potencia (Cos φ):</label>
+                    <input type="number" id="mono-fp" placeholder="Ingrese factor de potencia (0.1 - 1)" min="0.1" max="1" step="0.01" value="0.8">
+                    <div class="error-message" id="mono-fp-error">Por favor ingrese un valor entre 0.1 y 1</div>
+                </div>
+                
+                <button id="calcular-mono">Calcular KVA</button>
+                
+                <div class="result-container" id="mono-result">
+                    <h3>Resultado del Cálculo</h3>
+                    <div class="result-value" id="mono-kva-result">0 KVA</div>
+                    <div class="result-value" id="mono-kw-result">0 KW</div>
+                    
+                    <div class="formula-explanation">
+                        <h3>Fórmula utilizada:</h3>
+                        <p>Para sistemas monofásicos:</p>
+                        <p>KVA = (V × I) / 1000</p>
+                        <p>KW = KVA × Factor de Potencia</p>
+                        <p>Donde:</p>
+                        <ul>
+                            <li>V = Tensión en Voltios</li>
+                            <li>I = Corriente en Amperios</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            
+            <div id="trifasico" class="tab-content">
+                <h2>Cálculo de KVA Trifásico</h2>
+                <div class="input-group">
+                    <label for="tri-tension">Tensión de Línea (V):</label>
+                    <input type="number" id="tri-tension" placeholder="Ingrese tensión en Voltios" min="0">
+                    <div class="error-message" id="tri-tension-error">Por favor ingrese un valor válido para la tensión</div>
+                </div>
+                
+                <div class="input-group">
+                    <label for="tri-corriente">Corriente de Línea (A):</label>
+                    <input type="number" id="tri-corriente" placeholder="Ingrese corriente en Amperios" min="0">
+                    <div class="error-message" id="tri-corriente-error">Por favor ingrese un valor válido para la corriente</div>
+                </div>
+                
+                <div class="input-group">
+                    <label for="tri-fp">Factor de Potencia (Cos φ):</label>
+                    <input type="number" id="tri-fp" placeholder="Ingrese factor de potencia (0.1 - 1)" min="0.1" max="1" step="0.01" value="0.8">
+                    <div class="error-message" id="tri-fp-error">Por favor ingrese un valor entre 0.1 y 1</div>
+                </div>
+                
+                <button id="calcular-tri">Calcular KVA</button>
+                
+                <div class="result-container" id="tri-result">
+                    <h3>Resultado del Cálculo</h3>
+                    <div class="result-value" id="tri-kva-result">0 KVA</div>
+                    <div class="result-value" id="tri-kw-result">0 KW</div>
+                    
+                    <div class="formula-explanation">
+                        <h3>Fórmula utilizada:</h3>
+                        <p>Para sistemas trifásicos:</p>
+                        <p>KVA = (√3 × V × I) / 1000</p>
+                        <p>KW = KVA × Factor de Potencia</p>
+                        <p>Donde:</p>
+                        <ul>
+                            <li>V = Tensión de línea en Voltios</li>
+                            <li>I = Corriente de línea en Amperios</li>
+                            <li>√3 ≈ 1.732</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            
+            <div id="factor-potencia" class="tab-content">
+                <h2>Corrección del Factor de Potencia</h2>
+                <div class="input-group">
+                    <label for="fp-actual">Factor de Potencia Actual:</label>
+                    <input type="number" id="fp-actual" placeholder="Ingrese el factor de potencia actual (0.1 - 1)" min="0.1" max="1" step="0.01">
+                    <div class="error-message" id="fp-actual-error">Por favor ingrese un valor entre 0.1 y 1</div>
+                </div>
+                
+                <div class="input-group">
+                    <label for="fp-deseado">Factor de Potencia Deseado:</label>
+                    <input type="number" id="fp-deseado" placeholder="Ingrese el factor de potencia deseado (0.1 - 1)" min="0.1" max="1" step="0.01" value="0.95">
+                    <div class="error-message" id="fp-deseado-error">Por favor ingrese un valor entre 0.1 y 1</div>
+                </div>
+                
+                <div class="input-group">
+                    <label for="potencia-activa">Potencia Activa (kW):</label>
+                    <input type="number" id="potencia-activa" placeholder="Ingrese la potencia activa en kW" min="0">
+                    <div class="error-message" id="potencia-activa-error">Por favor ingrese un valor válido para la potencia activa</div>
+                </div>
+                
+                <button id="calcular-fp">Calcular Capacitores</button>
+                
+                <div class="result-container" id="fp-result">
+                    <h3>Capacitores Necesarios</h3>
+                    <div class="result-value" id="fp-kvar-result">0 kVAr</div>
+                    
+                    <div class="formula-explanation">
+                        <h3>Fórmula utilizada:</h3>
+                        <p>kVAr = kW × (tan(arccos(FP₁)) - tan(arccos(FP₂)))</p>
+                        <p>Donde:</p>
+                        <ul>
+                            <li>kW = Potencia activa</li>
+                            <li>FP₁ = Factor de potencia actual</li>
+                            <li>FP₂ = Factor de potencia deseado</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            
+            <div id="tablas" class="tab-content">
+                <h2>Tablas de Referencia</h2>
+                
+                <h3>Factores de Potencia Típicos</h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Tipo de Carga</th>
+                            <th>Factor de Potencia (Cos φ)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Motores de inducción con carga parcial</td>
+                            <td>0.50 - 0.75</td>
+                        </tr>
+                        <tr>
+                            <td>Motores de inducción a plena carga</td>
+                            <td>0.80 - 0.85</td>
+                        </tr>
+                        <tr>
+                            <td>Lámparas incandescentes</td>
+                            <td>1.00</td>
+                        </tr>
+                        <tr>
+                            <td>Lámparas fluorescentes (sin compensar)</td>
+                            <td>0.50 - 0.60</td>
+                        </tr>
+                        <tr>
+                            <td>Lámparas LED</td>
+                            <td>0.90 - 0.95</td>
+                        </tr>
+                        <tr>
+                            <td>Soldadores eléctricos</td>
+                            <td>0.60 - 0.70</td>
+                        </tr>
+                        <tr>
+                            <td>Hornos de inducción</td>
+                            <td>0.70 - 0.80</td>
+                        </tr>
+                    </tbody>
+                </table>
+                
+                <h3>Tensiones Típicas</h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Tipo de Instalación</th>
+                            <th>Tensión Típica</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Monofásica residencial (Argentina)</td>
+                            <td>220V</td>
+                        </tr>
+                        <tr>
+                            <td>Trifásica comercial/industrial (Argentina)</td>
+                            <td>380V</td>
+                        </tr>
+                        <tr>
+                            <td>Monofásica residencial (EE.UU.)</td>
+                            <td>120V</td>
+                        </tr>
+                        <tr>
+                            <td>Trifásica comercial/industrial (EE.UU.)</td>
+                            <td>208V / 480V</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // Sistema de tabs
+        document.addEventListener('DOMContentLoaded', function() {
+            const tabButtons = document.querySelectorAll('.tab-button');
+            const tabContents = document.querySelectorAll('.tab-content');
+            
+            tabButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    const tabId = this.getAttribute('data-tab');
+                    
+                    // Desactivar todos los tabs
+                    tabButtons.forEach(btn => btn.classList.remove('active'));
+                    tabContents.forEach(content => content.classList.remove('active'));
+                    
+                    // Activar el tab seleccionado
+                    this.classList.add('active');
+                    document.getElementById(tabId).classList.add('active');
+                });
+            });
+            
+            // Calculadora Monofásica
+            const calcularMonoBtn = document.getElementById('calcular-mono');
+            calcularMonoBtn.addEventListener('click', calcularMonofasico);
+            
+            // Calculadora Trifásica
+            const calcularTriBtn = document.getElementById('calcular-tri');
+            calcularTriBtn.addEventListener('click', calcularTrifasico);
+            
+            // Calculadora Factor de Potencia
+            const calcularFpBtn = document.getElementById('calcular-fp');
+            calcularFpBtn.addEventListener('click', calcularFactorPotencia);
+            
+            // Validación de inputs al cambiar
+            const allInputs = document.querySelectorAll('input');
+            allInputs.forEach(input => {
+                input.addEventListener('input', function() {
+                    validateInput(this);
+                });
+            });
+        });
+        
+        // Validación de inputs
+        function validateInput(input) {
+            const errorId = input.id + '-error';
+            const errorElement = document.getElementById(errorId);
+            
+            if (!errorElement) return true;
+            
+            let isValid = true;
+            const value = parseFloat(input.value);
+            
+            // Validar que sea un número
+            if (isNaN(value) || input.value === '') {
+                errorElement.textContent = 'Por favor ingrese un valor numérico';
+                errorElement.style.display = 'block';
+                isValid = false;
+            } 
+            // Validar rango para factor de potencia
+            else if (input.id.includes('fp')) {
+                if (value < 0.1 || value > 1) {
+                    errorElement.textContent = 'El factor de potencia debe estar entre 0.1 y 1';
+                    errorElement.style.display = 'block';
+                    isValid = false;
+                }
+            } 
+            // Validar que sea positivo para otros campos
+            else if (value <= 0) {
+                errorElement.textContent = 'El valor debe ser mayor que cero';
+                errorElement.style.display = 'block';
+                isValid = false;
+            }
+            
+            if (isValid) {
+                errorElement.style.display = 'none';
+            }
+            
+            return isValid;
+        }
+        
+        // Cálculo Monofásico
+        function calcularMonofasico() {
+            const tension = document.getElementById('mono-tension');
+            const corriente = document.getElementById('mono-corriente');
+            const fp = document.getElementById('mono-fp');
+            const resultContainer = document.getElementById('mono-result');
+            const kvaResult = document.getElementById('mono-kva-result');
+            const kwResult = document.getElementById('mono-kw-result');
+            
+            // Validar inputs
+            const isTensionValid = validateInput(tension);
+            const isCorrienteValid = validateInput(corriente);
+            const isFpValid = validateInput(fp);
+            
+            if (!isTensionValid || !isCorrienteValid || !isFpValid) {
+                return;
+            }
+            
+            // Cálculos
+            const tensionValue = parseFloat(tension.value);
+            const corrienteValue = parseFloat(corriente.value);
+            const fpValue = parseFloat(fp.value);
+            
+            const kva = (tensionValue * corrienteValue) / 1000;
+            const kw = kva * fpValue;
+            
+            // Mostrar resultados
+            kvaResult.textContent = kva.toFixed(2) + ' KVA';
+            kwResult.textContent = kw.toFixed(2) + ' KW';
+            
+            // Animar aparición de resultados
+            resultContainer.classList.add('active');
+        }
+        
+        // Cálculo Trifásico
+        function calcularTrifasico() {
+            const tension = document.getElementById('tri-tension');
+            const corriente = document.getElementById('tri-corriente');
+            const fp = document.getElementById('tri-fp');
+            const resultContainer = document.getElementById('tri-result');
+            const kvaResult = document.getElementById('tri-kva-result');
+            const kwResult = document.getElementById('tri-kw-result');
+            
+            // Validar inputs
+            const isTensionValid = validateInput(tension);
+            const isCorrienteValid = validateInput(corriente);
+            const isFpValid = validateInput(fp);
+            
+            if (!isTensionValid || !isCorrienteValid || !isFpValid) {
+                return;
+            }
+            
+            // Cálculos
+            const tensionValue = parseFloat(tension.value);
+            const corrienteValue = parseFloat(corriente.value);
+            const fpValue = parseFloat(fp.value);
+            
+            const kva = (Math.sqrt(3) * tensionValue * corrienteValue) / 1000;
+            const kw = kva * fpValue;
+            
+            // Mostrar resultados
+            kvaResult.textContent = kva.toFixed(2) + ' KVA';
+            kwResult.textContent = kw.toFixed(2) + ' KW';
+            
+            // Animar aparición de resultados
+            resultContainer.classList.add('active');
+        }
+        
+        // Cálculo Factor de Potencia
+        function calcularFactorPotencia() {
+            const fpActual = document.getElementById('fp-actual');
+            const fpDeseado = document.getElementById('fp-deseado');
+            const potenciaActiva = document.getElementById('potencia-activa');
+            const resultContainer = document.getElementById('fp-result');
+            const kvarResult = document.getElementById('fp-kvar-result');
+            
+            // Validar inputs
+            const isFpActualValid = validateInput(fpActual);
+            const isFpDeseadoValid = validateInput(fpDeseado);
+            const isPotenciaActivaValid = validateInput(potenciaActiva);
+            
+            if (!isFpActualValid || !isFpDeseadoValid || !isPotenciaActivaValid) {
+                return;
+            }
+            
+            // Cálculos
+            const fpActualValue = parseFloat(fpActual.value);
+            const fpDeseadoValue = parseFloat(fpDeseado.value);
+            const potenciaActivaValue = parseFloat(potenciaActiva.value);
+            
+            // Convertir FP a ángulos
+            const anguloActual = Math.acos(fpActualValue);
+            const anguloDeseado = Math.acos(fpDeseadoValue);
+            
+            // Calcular potencia reactiva necesaria
+            const kvar = potenciaActivaValue * (Math.tan(anguloActual) - Math.tan(anguloDeseado));
+            
+            // Mostrar resultados
+            kvarResult.textContent = Math.abs(kvar).toFixed(2) + ' kVAr';
+            
+            // Animar aparición de resultados
+            resultContainer.classList.add('active');
+        }
+    </script>
+</body>
+</html>
